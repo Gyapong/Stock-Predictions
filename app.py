@@ -89,7 +89,7 @@ app.layout = html.Div(style={'backgroundColor': '#111111'}, children=[
               [State('input-1-submit', 'value')])
 
 def update_output(ns1, nb1, input1):
-    api_key = 'U6ZCFDY7F487XP4G' # your api key from https://www.alphavantage.co/documentation/#daily
+    api_key = 'your_key' # your api key from https://www.alphavantage.co/documentation/#daily
     
     if input1 == '':
         return dict() # return an empty dict so you dont make a bad request
