@@ -22,7 +22,7 @@ class Stocks(object):
         j = resp.json()
         self.df = pd.DataFrame(j['Time Series (Daily)']).T
         self.filename = stock_name
-        return self.df
+        return self
     
     
     @staticmethod
@@ -124,7 +124,7 @@ class Stocks(object):
             return plot(fig, filename = filename+'.html')
         return iplot(fig, filename = filename)
     
-    
+
     def widget(self,window):
         if window == 5:
             Stocks.candle_moving(self.df, self.filename, 5)
@@ -135,7 +135,7 @@ class Stocks(object):
         elif window == 50:
             Stocks.candle_moving(self.df, self.filename, 50)
         elif window == 100:
-            Stocks.candle_moving(self.df, self.flename, 100)
+            Stocks.candle_moving(self.df, self.filename, 100)
         elif window == 'None':
             Stocks.candle(self.df, self.filename)
             
@@ -209,3 +209,7 @@ class Stocks(object):
         fig = m.plot_components(forecast)
         
         return Stocks.trace(forecast, f_df, filename=self.filename)
+    
+    def ma_plot(self):
+        interact(self.widget, window = widgets.Dropdown(options=['None', 5,10,20,50,100], value = 'None',
+                                          description='MA Window ', disabled=False))
