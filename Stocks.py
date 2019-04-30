@@ -213,3 +213,4 @@ class Stocks(object):
     def ma_plot(self):
         interact(self.widget, window = widgets.Dropdown(options=['None', 5,10,20,50,100], value = 'None',
                                           description='MA Window ', disabled=False))
+        return self
