@@ -6,13 +6,45 @@ class Stocks(object):
         self.filename = None
         
 
-    def get(self, stock_name):
+    def get_daily(self, stock_name):
         resp = requests.get(f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={stock_name}&apikey={self.api_key}&outputsize=full')
         j = resp.json()
         self.df = pd.DataFrame(j['Time Series (Daily)']).T
         self.filename = stock_name
         return self
     
+    def get_hourly(self, stock_name, interval):
+        # interval can be 1min, 5min, 15min, 30min, 60min 
+        resp = requests.get(f'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={stock_name}&interval={interval}&apikey={self.api_key}&outputsize=compact')
+        j = resp.json()
+        
+#         if interval == '1min':
+#             self.df = pd.DataFrame(j['Time Series (1min)']).T
+#             self.filename = stock_name
+#             return self
+        
+        if interval == '5min':
+            self.df = pd.DataFrame(j['Time Series (5min)']).T.iloc[:78, :]
+            self.filename = stock_name
+            return self
+        
+        elif interval == '15min':
+            self.df = pd.DataFrame(j['Time Series (15min)']).T.iloc[:26, :]
+            self.filename = stock_name
+            return self
+        
+        elif interval == '30min':
+            self.df = pd.DataFrame(j['Time Series (30min)']).T.iloc[:13, :]
+            self.filename = stock_name
+            return self
+
+        elif interval == '60min':
+            self.df = pd.DataFrame(j['Time Series (60min)']).T.iloc[:7, :]
+            self.filename = stock_name
+            return self
+        
+        else:
+            raise ValueError(f'"{interval}" is not in ["5min", "15min", "30min", "60min"]')
     
     @staticmethod
     def candle_moving(df1, filename, window, offline=False):     
@@ -110,6 +142,56 @@ class Stocks(object):
                          label='5y',
                          step='year',
                          stepmode='backward'),
+                    dict(step='all')
+                ])
+            ),
+            rangeslider=dict(
+                visible = True,
+            ),
+            type='date'
+        )
+        )
+        
+        fig = dict(data=data, layout=layout)
+        
+        if offline:
+            return plot(fig, filename = filename+'.html')
+        return iplot(fig, filename = filename)
+    
+
+    @staticmethod
+    def h_plot(df1, filename, offline=False):
+        cs = go.Candlestick(x=df1.index,
+                        open=df1['1. open'],
+                        high=df1['2. high'],
+                        low=df1['3. low'],
+                        close=df1['4. close'], name = filename, yaxis = 'y2')
+        
+        vol = go.Bar(x=df1.index, y=df1['5. volume'],                         
+                   yaxis='y', name='Volume', marker = dict(color = 'rgb(140, 188, 250)'))
+
+        data = [cs,vol]
+
+        layout = dict(
+        title='Stocks',
+        margin = dict( t=40, b=40, r=40, l=40 ),
+        yaxis = dict(showgrid=False, showticklabels=False, domain = [0, 0.2]),
+        yaxis2 = dict(domain = [0.2, 0.8], zeroline=False),
+        xaxis=dict(
+            rangeselector=dict(
+                buttons=list([
+                    dict(count=1,
+                         label='1h',
+                         step='hour',
+                         stepmode='backward'),
+                    dict(count=3,
+                         label='3h',
+                         step='hour',
+                         stepmode='backward'),
+                    dict(count=5,
+                        label='5h',
+                        step='hour',
+                        stepmode='backward'),
                     dict(step='all')
                 ])
             ),
