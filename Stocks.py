@@ -15,26 +15,28 @@ class Stocks(object):
     
     
     @staticmethod
-    def candle_moving(df1, filename, window, offline=False):
+    def candle_moving(df1, filename, window, offline=False):     
         moving_average = go.Scatter(x = df1[::-1].index, y = df1[::-1]['4. close'].rolling(window=window,
                                                                                            min_periods=5).mean(),
                                     name = 'moving_average', mode = 'lines', 
-                                    marker = dict(color = ('rgb(255,140,0)')), yaxis = 'y')
+                                    marker = dict(color = ('rgb(255,140,0)')), yaxis = 'y2')
         
         cs = go.Candlestick(x=df1.index,
                         open=df1['1. open'],
                         high=df1['2. high'],
                         low=df1['3. low'],
-                        close=df1['4. close'], name = filename, yaxis = 'y')
+                        close=df1['4. close'], name = filename, yaxis = 'y2')
         
         vol = go.Bar(x=df1.index, y=df1['5. volume'],                         
-                   yaxis='y2', name='Volume', marker = dict(color = 'rgb(140, 188, 250)'), opacity = 0.4)
+                   yaxis='y', name='Volume', marker = dict(color = 'rgb(140, 188, 250)'))
 
         data = [cs, moving_average, vol]
 
         layout = dict(
         title='Stocks',
-        yaxis2 = dict(overlaying='y', side='right'),
+        margin = dict( t=40, b=40, r=40, l=40 ),
+        yaxis = dict(showgrid=False, showticklabels=False, domain = [0, 0.2]),
+        yaxis2 = dict(domain = [0.2, 0.8], zeroline=False),
         xaxis=dict(
             rangeselector=dict(
                 buttons=list([
@@ -77,16 +79,18 @@ class Stocks(object):
                         open=df1['1. open'],
                         high=df1['2. high'],
                         low=df1['3. low'],
-                        close=df1['4. close'], name = filename, yaxis = 'y')
+                        close=df1['4. close'], name = filename, yaxis = 'y2')
         
         vol = go.Bar(x=df1.index, y=df1['5. volume'],                         
-                   yaxis='y2', name='Volume', marker = dict(color = 'rgb(140, 188, 250)'), opacity = 0.4)
+                   yaxis='y', name='Volume', marker = dict(color = 'rgb(140, 188, 250)'))
 
         data = [cs,vol]
 
         layout = dict(
         title='Stocks',
-        yaxis2 = dict(overlaying='y', side='right'),
+        margin = dict( t=40, b=40, r=40, l=40 ),
+        yaxis = dict(showgrid=False, showticklabels=False, domain = [0, 0.2]),
+        yaxis2 = dict(domain = [0.2, 0.8], zeroline=False),
         xaxis=dict(
             rangeselector=dict(
                 buttons=list([
