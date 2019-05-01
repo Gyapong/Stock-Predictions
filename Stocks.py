@@ -16,7 +16,6 @@ class Stocks(object):
     
     @staticmethod
     def candle_moving(df1, filename, window, offline=False):
-                
         moving_average = go.Scatter(x = df1[::-1].index, y = df1[::-1]['4. close'].rolling(window=window,
                                                                                            min_periods=5).mean(),
                                     name = 'moving_average', mode = 'lines', 
@@ -74,7 +73,6 @@ class Stocks(object):
 
     @staticmethod
     def candle(df1, filename, offline=False):
-        
         cs = go.Candlestick(x=df1.index,
                         open=df1['1. open'],
                         high=df1['2. high'],
