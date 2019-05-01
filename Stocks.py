@@ -1,14 +1,3 @@
-import pandas as pd
-import requests
-from fbprophet import Prophet
-import plotly as py
-import plotly.graph_objs as go
-from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
-%matplotlib inline
-init_notebook_mode(connected=True)
-from ipywidgets import interact
-from ipywidgets import widgets
-
 class Stocks(object):
     
     def __init__(self, api_key):
@@ -27,21 +16,26 @@ class Stocks(object):
     
     @staticmethod
     def candle_moving(df1, filename, window, offline=False):
+                
         moving_average = go.Scatter(x = df1[::-1].index, y = df1[::-1]['4. close'].rolling(window=window,
                                                                                            min_periods=5).mean(),
                                     name = 'moving_average', mode = 'lines', 
-                                    marker = dict(color = ('rgb(255,140,0)')))
-
+                                    marker = dict(color = ('rgb(255,140,0)')), yaxis = 'y')
+        
         cs = go.Candlestick(x=df1.index,
                         open=df1['1. open'],
                         high=df1['2. high'],
                         low=df1['3. low'],
-                        close=df1['4. close'], name = filename)
+                        close=df1['4. close'], name = filename, yaxis = 'y')
+        
+        vol = go.Bar(x=df1.index, y=df1['5. volume'],                         
+                   yaxis='y2', name='Volume', marker = dict(color = 'rgb(140, 188, 250)'), opacity = 0.4)
 
-        data = [cs, moving_average]
+        data = [cs, moving_average, vol]
 
         layout = dict(
         title='Stocks',
+        yaxis2 = dict(overlaying='y', side='right'),
         xaxis=dict(
             rangeselector=dict(
                 buttons=list([
@@ -65,13 +59,14 @@ class Stocks(object):
                 ])
             ),
             rangeslider=dict(
-                visible = True
+                visible = True,
             ),
             type='date'
         )
         )
-
+        
         fig = dict(data=data, layout=layout)
+        
         if offline:
             return plot(fig, filename = filename+'.html')
         return iplot(fig, filename = filename)
@@ -79,17 +74,21 @@ class Stocks(object):
 
     @staticmethod
     def candle(df1, filename, offline=False):
-
+        
         cs = go.Candlestick(x=df1.index,
                         open=df1['1. open'],
                         high=df1['2. high'],
                         low=df1['3. low'],
-                        close=df1['4. close'], name = filename)
+                        close=df1['4. close'], name = filename, yaxis = 'y')
+        
+        vol = go.Bar(x=df1.index, y=df1['5. volume'],                         
+                   yaxis='y2', name='Volume', marker = dict(color = 'rgb(140, 188, 250)'), opacity = 0.4)
 
-        data = [cs]
+        data = [cs,vol]
 
         layout = dict(
         title='Stocks',
+        yaxis2 = dict(overlaying='y', side='right'),
         xaxis=dict(
             rangeselector=dict(
                 buttons=list([
@@ -113,13 +112,14 @@ class Stocks(object):
                 ])
             ),
             rangeslider=dict(
-                visible = True
+                visible = True,
             ),
             type='date'
         )
         )
-
+        
         fig = dict(data=data, layout=layout)
+        
         if offline:
             return plot(fig, filename = filename+'.html')
         return iplot(fig, filename = filename)
@@ -197,7 +197,7 @@ class Stocks(object):
 
     
     
-    def future(self):
+    def plot_future(self):
         f_df = self.df.reset_index().rename(columns={'4. close': 'y', 'index':'ds'})[['ds', 'y']]
         f_df['y'] = f_df['y'].astype('float')
 
